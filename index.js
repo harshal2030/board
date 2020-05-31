@@ -4,11 +4,17 @@ import {AppRegistry} from 'react-native';
 import App from './src/App';
 import {name as appName} from './app.json';
 import {NavigationContainer} from '@react-navigation/native';
+import configureStore from './src/store/configureStore';
+import {Provider} from 'react-redux';
+
+const store = configureStore();
 
 const Wrapper = () => (
-  <NavigationContainer>
-    <App />
-  </NavigationContainer>
+  <Provider store={store}>
+    <NavigationContainer>
+      <App />
+    </NavigationContainer>
+  </Provider>
 );
 
 AppRegistry.registerComponent(appName, () => Wrapper);

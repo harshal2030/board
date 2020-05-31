@@ -1,13 +1,19 @@
 import * as React from 'react';
-import {ActivityIndicator, Text} from 'react-native';
+import {ActivityIndicator, StyleSheet, Alert} from 'react-native';
 import {Header, Body, Container, Title, Content} from 'native-base';
 import {
   commonBackground,
   commonBlue,
   statusbarColor,
 } from './../styles/commonColors';
-import {TextInput, Button} from 'react-native-paper';
+import {TextInput, Button, Text} from 'react-native-paper';
 import validator from 'validator';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import * as registerToken from './../actions/registerToken';
+import * as profileData from '../actions/profileData';
+import {signupURL} from './../urls.json';
+import AsyncStorage from '@react-native-community/async-storage';
 
 class Signup extends React.Component {
   state = {
@@ -17,6 +23,53 @@ class Signup extends React.Component {
     mailError: false,
     password: '',
     loading: false,
+    token: '',
+  };
+
+  storeData = async () => {
+    try {
+      await AsyncStorage.setItem('token', this.state.token);
+    } catch (e) {
+      // no action
+    }
+  };
+
+  uploadData = () => {
+    const {name, username, email, password} = this.state;
+    this.setState({loading: true}, () => {
+      fetch(signupURL, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          username,
+          email,
+          password,
+        }),
+      })
+        .then((res) => {
+          this.setState({loading: false});
+          if (res.status !== 200) {
+            throw new Error();
+          }
+
+          return res.json();
+        })
+        .then((resJson) => {
+          this.props.actions.registerToken(resJson.token);
+          this.props.actions.profileData(resJson.user);
+          this.setState({token: resJson.token}, () => this.storeData());
+        })
+        .catch(() =>
+          Alert.alert(
+            'Error',
+            'Unable to create account for now. Try again later',
+          ),
+        );
+    });
   };
 
   updateButton = () => {
@@ -26,6 +79,7 @@ class Signup extends React.Component {
 
     return (
       <Button
+        onPress={this.uploadData}
         mode="contained"
         style={{backgroundColor: commonBlue, marginTop: 20, borderColor: 8}}>
         Create Account
@@ -46,7 +100,7 @@ class Signup extends React.Component {
 
   showError = (errorRef, msg) => {
     if (errorRef) {
-      return <Text>{msg}</Text>;
+      return <Text style={styles.errorText}>{msg}</Text>;
     } else {
       return null;
     }
@@ -132,4 +186,21 @@ class Signup extends React.Component {
   }
 }
 
-export default Signup;
+const styles = StyleSheet.create({
+  errorText: {
+    color: '#B00020',
+  },
+});
+
+const ActionCreators = Object.assign({}, registerToken, profileData);
+
+const mapDispatchToProps = (dispatch) => ({
+  actions: bindActionCreators(ActionCreators, dispatch),
+});
+
+const mapStateToProps = (state) => ({
+  token: state.token.token,
+  profile: state.profile.profile,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);
