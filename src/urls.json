@@ -1,5 +1,5 @@
 {
-    "rootURL": "http://192.168.43.25:3000",
-    "signupURL": "http://192.168.43.25:3000/user/signup",
-    "loginURL": "http://192.168.43.25:3000/user/login"
+    "rootURL": "http://192.168.43.25:3001",
+    "signupURL": "http://192.168.43.25:3001/user/signup",
+    "loginURL": "http://192.168.43.25:3001/user/login"
 }

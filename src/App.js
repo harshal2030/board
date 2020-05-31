@@ -2,7 +2,8 @@ import * as React from 'react';
 import {ActivityIndicator} from 'react-native';
 import Signup from './screen/Signup';
 import Login from './screen/Login';
-import Home from './screen/Home';
+import MainScreen from './screen/Drawer';
+import Board from './screen/Board';
 import {createStackNavigator} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
@@ -26,6 +27,7 @@ class App extends React.Component {
   check = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log(token);
       this.setState({loading: false});
       if (token !== null) {
         fetch(`${rootURL}/user/token`, {
@@ -38,6 +40,7 @@ class App extends React.Component {
         })
           .then((res) => {
             this.setState({loading: false});
+            console.log(res.status);
             if (res.status !== 200) {
               throw new Error();
             }
@@ -46,6 +49,7 @@ class App extends React.Component {
           })
           .then((resJson) => {
             this.props.actions.registerToken(token);
+            console.log(resJson);
             this.props.actions.profileData(resJson);
           })
           .catch(() => {
@@ -75,7 +79,8 @@ class App extends React.Component {
           </>
         ) : (
           <>
-            <Stack.Screen name="home" component={Home} />
+            <Stack.Screen name="home" component={MainScreen} />
+            <Stack.Screen name="board" component={Board} />
           </>
         )}
       </Stack.Navigator>

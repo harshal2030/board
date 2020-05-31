@@ -52,6 +52,7 @@ class Signup extends React.Component {
       })
         .then((res) => {
           this.setState({loading: false});
+          console.log(res.status);
           if (res.status !== 200) {
             throw new Error();
           }

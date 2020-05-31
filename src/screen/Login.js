@@ -70,6 +70,7 @@ class Login extends React.Component {
     return (
       <Button
         mode="contained"
+        onPress={this.uploadData}
         style={{backgroundColor: commonBlue, marginTop: 20, borderColor: 8}}>
         Log In
       </Button>
